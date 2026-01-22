@@ -59,7 +59,5 @@ git clone https://github.com/2003Mohammed/Jenkins-installation.git
 * This setup uses **CentOS/RHEL**. Debian/Ubuntu users can use `apt` instead.
 * Screenshots help you visualize each step after the setup of Jenkins and working with the UI.
 
-```
-
 ---
 
