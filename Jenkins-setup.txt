@@ -1,0 +1,260 @@
+# Jenkins Installation & Setup on CentOS / RHEL (Port 8090)
+
+ File paths and service locations can vary slightly by distro/version. Commands shown are based on common RHEL/CentOS patterns.
+
+## Overview
+
+Jenkins is a popular open‑source automation server used for CI/CD. You can install Jenkins on **Debian/Ubuntu** using `apt`, or on **RHEL/CentOS/Alma/Rocky/Oracle Linux** using **`yum` + `rpm`**.
+
+In this guide, Jenkins is installed on a **CentOS / RHEL‑based system** and configured to run on **port 8090 instead of the default 8080**.
+
+---
+
+## Prerequisites
+
+* CentOS / RHEL / AlmaLinux / Rocky Linux
+* Sudo privileges
+* Internet access
+
+---
+
+## Step 1: Add Jenkins Repository
+
+```bash
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+https://pkg.jenkins.io/rpm-stable/jenkins.repo
+```
+
+Upgrade existing packages:
+
+```bash
+sudo yum upgrade -y
+```
+
+---
+
+## Step 2: Install Java (Required)
+
+Jenkins requires Java. Here we use **Java 21**:
+
+```bash
+sudo yum install -y fontconfig java-21-openjdk
+```
+
+Verify:
+
+```bash
+java -version
+```
+
+---
+
+## Step 3: Install Jenkins
+
+```bash
+sudo yum install -y jenkins
+```
+
+Reload systemd:
+
+```bash
+sudo systemctl daemon-reload
+```
+
+---
+
+## Step 4: Change Jenkins Port (8080 → 8090)
+
+By default, Jenkins runs on **port 8080**. We change it to **8090**.
+
+### Option A (Common): Edit Jenkins Environment File using insert mode by clicking lowercase i
+
+```bash
+sudo vi /etc/sysconfig/jenkins
+```
+
+Find:
+
+```bash
+JENKINS_PORT="8080"
+```
+
+Change to:
+
+```bash
+JENKINS_PORT="8090"
+```
+
+Save and exit using esc and :wq .
+
+### Option B (If environment is defined in service file)
+
+```bash
+sudo vi /usr/lib/systemd/system/jenkins.service
+```
+
+Look for:
+
+```bash
+Environment="JENKINS_PORT=8080"
+```
+
+Change to:
+
+```bash
+Environment="JENKINS_PORT=8090"
+```
+
+Reload systemd again:
+
+```bash
+sudo systemctl daemon-reload
+```
+
+---
+
+## Step 5: Start & Enable Jenkins
+
+Enable Jenkins at boot:
+
+```bash
+sudo systemctl enable jenkins
+```
+
+Start Jenkins:
+
+```bash
+sudo systemctl start jenkins
+```
+
+Check status:
+
+```bash
+sudo systemctl status jenkins
+```
+
+---
+
+## Step 6: Access Jenkins UI
+
+Open browser:
+
+```
+http://localhost:8090
+```
+
+---
+
+## Step 7: Unlock Jenkins
+
+Get initial admin password:
+
+```bash
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+```
+
+Paste it into **Unlock Jenkins** screen → **Continue**.
+
+---
+
+## Step 8: Install Plugins
+
+Choose one:
+
+* **Install suggested plugins** (recommended)
+* **Select plugins to install** (manual)
+
+Wait for installation to complete.
+
+---
+
+## Step 9: Create Admin User
+
+Fill:
+
+* Username
+* Password
+* Full name
+* Email
+
+Click **Save and Finish** → **Start using Jenkins**.
+
+---
+
+## Step 10: I Created a Sample Freestyle Job called sample build
+
+### Job Configuration
+
+* **Type**: Freestyle project
+* **Source Code Management**: Git
+* **Repository URL**:
+
+```
+https://github.com/2003Mohammed/Jenkins-installation.git
+```
+
+* **Branch**:
+
+```
+main
+```
+
+### Build Trigger
+
+Enable **Poll SCM**:
+
+```text
+H/1 * * * *
+```
+
+---
+
+## Step 11: Build Step (Execute Shell)
+
+```bash
+echo "===== JENKINS FREESTYLE BUILD START ====="
+
+echo "Workspace location:"
+pwd
+
+echo "Listing files:"
+ls -la
+
+echo "Git branch:"
+git branch
+
+echo "Build step placeholder completed"
+
+echo "===== BUILD END ====="
+```
+
+---
+
+## Step 12: Build & Verify
+
+* Click **Build Now**
+* Check **Console Output**
+* Verify repository checkout and shell execution
+
+---
+
+## Screenshots are attached !
+
+📸 Screenshots included in this repository:
+
+* Unlock Jenkins screen
+* Plugin installation
+* Freestyle job configuration
+* Successful build output
+
+---
+
+## Summary
+
+* Jenkins installed using **YUM + RPM** on RHEL‑based OS
+* Default port changed from **8080 → 8090**
+* Jenkins secured with admin user
+* GitHub repo integrated
+* Freestyle job built successfully
+
+This setup demonstrates a **basic but production‑style Jenkins installation** suitable for CI/CD learning and DevOps workflows.
